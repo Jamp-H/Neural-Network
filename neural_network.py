@@ -20,18 +20,32 @@ from scipy.stats import norm
 # is_subtrain    : logical vector, size n_observations
 # Return: loss_values, V_mat, w_vec
 def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subtrain):
-    # initialize architecture of layered neural network
-    architecture = (X_col.shape[1], n_hidden_units, 1)
+    # initialize design of layered neural network
+    design = (X_mat.shape[1], n_hidden_units, 1)
 
     # divide X_mat and y_vec into train, validation (60% 40% respectively)
     X_train, X_val = split_train_val(X_mat)
     y_train, y_val = split_train_val(y_vec)
 
-    # initilize V_mat (weight matrix n_features x n_hidden_units)
+    # initilize V_mat list (weight matrix n_features x n_hidden_units)
         # used to predict hidden units given input
-    V_mat
-    for i in range(0,len(architecture)):
-        
+
+    V_mat = []
+    # loop though design of layers
+    # initilize each matrix; add to V_mat
+    for i in range(0,len(design) - 1):
+        # calculate dimensions and num of entries of new matrix
+        new_mat_row = design[i + 1]
+        new_mat_col = design[i]
+        num_of_entries = new_mat_row * new_mat_col
+
+        # create matrix
+        new_mat = np.zeros(num_of_entries)\
+                    .reshape(new_mat_row, new_mat_col)
+
+        # append matrix to list of matricies (V_mat)
+        V_mat.append(new_mat)
+
     # initilize w_vec (weight vector n_hidden_units size)
         # used to predict output given hidden units
 
@@ -66,7 +80,7 @@ def convert_data_to_matrix(file_name):
 #   X : matrix to be split
 # Return: train, validation matriceis
 def split_train_val(X):
-    train, validation = np.split( X, int(.6 * len(X)))
+    train, validation = np.split( X, [int(.6 * len(X))])
 
     return {"train": train, "val": validation}
 
@@ -87,5 +101,8 @@ def main():
 
     # Scale matrix for use
     X_sc = scale(X_mat)
+
+    # dummy data so not use to actually test
+    n_net_one_split(X_mat, y_vec, 10, .05, 10, 0)
 
 main()
