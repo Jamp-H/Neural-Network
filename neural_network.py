@@ -40,25 +40,24 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
         num_of_entries = new_mat_row * new_mat_col
 
         # create matrix
-        new_mat = np.zeros(num_of_entries)\
-                    .reshape(new_mat_row, new_mat_col)
-
+        new_mat = np.random.randn(new_mat_row, new_mat_col)
+        new_mat /= 10
         # append matrix to list of matricies (V_mat)
         V_mat.append(new_mat)
 
     # initilize w_vec (weight vector n_hidden_units size)
         # used to predict output given hidden units
-
+    
 
     # loop over epochs (k=1 to max_epochs)
         # update the parameters using the gradients with respect to each
         # subtrain observation
-
+    for epoch in range(0,max_epochs):
         # loop over data points in subtrain data set
-
-            # compute the gradients of V-mat/w-vec with respect to a a
+        for point in X_train:
+            # compute the gradients of V-mat/w-vec with respect to a
             # single observation in the subtrain set
-
+            pass
             # update V.mat/w.vec by taking a step (scaled by step.size)
             # in the negative gradient direction
 
@@ -84,12 +83,30 @@ def split_train_val(X):
 
     return {"train": train, "val": validation}
 
-
+# Function: forward_prop
+# INPUT ARGS:
+# in_mat          : input matrix (observations x features)
+# list_of_weights : List of maricies containing weights
+# Return: hidden layer vector
+def forward_prop(in_mat, list_of_weights):
+    h_list = []
+    h_list.append(in_mat)
+    for layer_i in range(0, len(list_of_weights)):
+        weight = list_of_weights[layer_i]
+        hidden_layer = h_list[layer_i]
+        a_vec = weight.matmul(hidden_layer)
+    if layer_i == len(list_of_weights) - 1:
+        h_list.append(a_vec)
+    else:
+        a_vec = 1/(1 + np.exp(-a_vec))
+    return h_list
 # Function: main
 # INPUT ARGS:
 #   none
 # Return: none
 def main():
+    np.random.seed(1)
+
     file_name = "spam.data"
     # Get data into matrix form
     X_mat_full = convert_data_to_matrix(file_name)
