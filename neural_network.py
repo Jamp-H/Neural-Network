@@ -9,6 +9,7 @@
 import numpy as np
 from sklearn.preprocessing import scale
 from scipy.stats import norm
+from random import randint
 
 # Function: n_net_one_split
 # INPUT ARGS:
@@ -26,6 +27,11 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
     # divide X_mat and y_vec into train, validation (60% 40% respectively)
     X_train, X_val = split_train_val(X_mat)
     y_train, y_val = split_train_val(y_vec)
+
+    validation = (is_subtrain == 1)
+
+    # get subtrain_X and subtrain_y of of training data and is_subtrain
+    subtrain_X = X_train[is_subtrain, :]
 
     # initilize V_mat list (weight matrix n_features x n_hidden_units)
         # used to predict hidden units given input
@@ -45,19 +51,16 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
         # append matrix to list of matricies (V_mat)
         V_mat.append(new_mat)
 
-    # initilize w_vec (weight vector n_hidden_units size)
-        # used to predict output given hidden units
-    
-
     # loop over epochs (k=1 to max_epochs)
         # update the parameters using the gradients with respect to each
         # subtrain observation
     for epoch in range(0,max_epochs):
+        i = 0
         # loop over data points in subtrain data set
         for point in X_train:
-            # compute the gradients of V-mat/w-vec with respect to a
+            # compute the gradients of V_mat/w_vec with respect to a
             # single observation in the subtrain set
-            pass
+            h_list = forward_prop(point, V_mat)
             # update V.mat/w.vec by taking a step (scaled by step.size)
             # in the negative gradient direction
 
@@ -81,16 +84,16 @@ def convert_data_to_matrix(file_name):
 def split_train_val(X):
     train, validation = np.split( X, [int(.6 * len(X))])
 
-    return {"train": train, "val": validation}
+    return (train, validation)
 
 # Function: forward_prop
 # INPUT ARGS:
-# in_mat          : input matrix (observations x features)
+# in_mat          : input row from matrix (1 x features)
 # list_of_weights : List of maricies containing weights
 # Return: hidden layer vector
-def forward_prop(in_mat, list_of_weights):
+def forward_prop(in_row, list_of_weights):
     h_list = []
-    h_list.append(in_mat)
+    h_list.append(in_row)
     for layer_i in range(0, len(list_of_weights)):
         weight = list_of_weights[layer_i]
         hidden_layer = h_list[layer_i]
@@ -119,7 +122,10 @@ def main():
     # Scale matrix for use
     X_sc = scale(X_mat)
 
+    subtrain = np.random.randint(1,5,X_mat_full_col_len-1)
+
+
     # dummy data so not use to actually test
-    n_net_one_split(X_mat, y_vec, 10, .05, 10, 0)
+    n_net_one_split(X_mat, y_vec, 10, .05, 10, subtrain)
 
 main()
