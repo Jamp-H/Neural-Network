@@ -129,7 +129,7 @@ log_loss_csv(log_loss_data):
 
         writer.writeheader()
         epoch = 0
-        for error in data[0][0].items():
+        for error in log_loss_data[0][0].items():
             writer.writerow({'epoch': epoch,
                             'train error': error})
             epoch +=1
@@ -141,7 +141,7 @@ log_loss_csv(log_loss_data):
 
             writer.writeheader()
             epoch = 0
-            for error in data[0][1].items():
+            for error in log_loss_data[0][1].items():
                 writer.writerow({'epoch': epoch,
                                 'val error': error})
                 epoch +=1
