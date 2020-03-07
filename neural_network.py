@@ -37,10 +37,9 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
     y_tild__val_vector = np.where(y_val==0, -1, y_val)
     # initilize V_mat list (weight matrix n_features x n_hidden_units)
         # used to predict hidden units given input
-
     V_mat = []
-
-
+    w_vec = np.random.randn(X_mat.shape[1])
+    w_vec /= 10
     # loop though design of layers
     # initilize each matrix; add to V_mat
     for i in range(0,len(design) - 1):
@@ -70,21 +69,14 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
             y_tild = y_tild__train_vector[index]
             h_list = forward_prop(point, V_mat)
 
-            layer = 2
-            while layer > 0:
-                if layer == 2:
-                    grad_a = (-y_tild) / 1 + np.exp(y_tild * h_list[layer-1])
-                else:
-                    grad_h = np.matmul(V_mat[layer], grad_a.reshape(10,1))
 
-                    w_vec = h_list[layer]
+            for layer in range(0,2):
+                grad_matrix_list.append(h_list[0])
+                hidden_layer = np.matmul(h_list[1], (1-h_list[1]))
+                with_weight = V_mat[1] * hidden_layer
+                grad = with_weight * point.reshape(57,1)
+                grad_matrix_list.append(grad)
 
-                    grad_a = grad_h * w_vec * (1-w_vec)
-
-                grad_val = np.matmul(grad_a.reshape(10,1), np.transpose(h_list[layer - 1].reshape(len(h_list[layer - 1]),1)))
-                print(grad_val.shape)
-                grad_matrix_list.append(grad_val)
-                layer -= 1
             # update V.mat/w.vec by taking a step (scaled by step.size)
             # in the negative gradient direction
             for layer in range(0, len(grad_matrix_list)):
@@ -92,9 +84,10 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
             index += 1
 
     # compute the logistic loss on the subtrain/validation sets
-    # store value in loss_values (log loss formula log[1+exp(-y_tild * real_pred)])
-    prediction_h_units_sub = forward_prop(np.transpose(subtrain_X), grad_matrix_list)
-    prediction_h_units_val = forward_prop(np.transpose(validation), grad_matrix_list)
+    # store value in loss_values (log loss
+    #  formula log[1+exp(-y_tild * real_pred)])
+    prediction_h_units_sub = forward_prop(subtrain_X, grad_matrix_list)
+    prediction_h_units_val = forward_prop(validation, grad_matrix_list)
 
     train_loss = np.log(1+np.exp(-y_tild__train_vector*prediction_h_units_sub))
     val_loss = np.log(1+np.exp(-y_tild__val_vector*prediction_h_units_val))
@@ -121,7 +114,7 @@ def split_train_val(X):
 
     return (train, validation)
 
-log_loss_csv(log_loss_data):
+def log_loss_csv(log_loss_data):
     with open("Neural_Net_Log_Loss_Train.csv", mode = 'w') as file:
 
         fieldnames = ['epochs', 'train error']
@@ -157,12 +150,13 @@ def forward_prop(in_row, list_of_weights):
     h_list = []
     h_list.append(in_row)
 
-    for layer_i in range(0, len(list_of_weights) - 1):
-        weight = list_of_weights[layer_i]
-        hidden_layer = h_list[layer_i]
+    for layer in range(0, len(list_of_weights) - 1):
+
+        weight = list_of_weights[layer]
+        hidden_layer = h_list[layer]
 
         a_vec = np.matmul(weight, hidden_layer)
-    if layer_i == len(list_of_weights) - 1:
+    if layer == len(list_of_weights) - 1:
         h_list.append(a_vec)
     else:
         a_vec = 1/(1 + np.exp(-a_vec))
