@@ -57,13 +57,13 @@ def n_net_one_split(X_mat, y_vec, max_epochs, step_size, n_hidden_units, is_subt
     for epoch in range(0,max_epochs):
         i = 0
         # loop over data points in subtrain data set
-        for point in X_train:
+        for point in subtrain_X:
             # compute the gradients of V_mat/w_vec with respect to a
             # single observation in the subtrain set
             h_list = forward_prop(point, V_mat)
             # update V.mat/w.vec by taking a step (scaled by step.size)
             # in the negative gradient direction
-
+            print(h_list)
         # compute the logistic loss on the subtrain/validation sets
         # store value in loss_values (log loss formula log[1+exp(-y_tild * real_pred)])
 
@@ -94,10 +94,10 @@ def split_train_val(X):
 def forward_prop(in_row, list_of_weights):
     h_list = []
     h_list.append(in_row)
-    for layer_i in range(0, len(list_of_weights)):
+    for layer_i in range(0, len(list_of_weights) - 1):
         weight = list_of_weights[layer_i]
         hidden_layer = h_list[layer_i]
-        a_vec = weight.matmul(hidden_layer)
+        a_vec = np.matmul(weight, hidden_layer)
     if layer_i == len(list_of_weights) - 1:
         h_list.append(a_vec)
     else:
